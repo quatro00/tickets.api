@@ -30,11 +30,11 @@ namespace tickets.api.Controllers.Admin
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto model)
         {
-            var user = await userManager.FindByNameAsync(model.Username);
+            var user = await userManager.FindByNameAsync(model.email);
             if (user == null)
-                return Unauthorized("Usuario o contraseña incorrectos.");
+                return BadRequest("Usuario o contraseña incorrectos.");
 
-            var result = await signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+            var result = await signInManager.CheckPasswordSignInAsync(user, model.password, false);
             if (!result.Succeeded)
                 return Unauthorized("Usuario o contraseña incorrectos.");
 
@@ -48,12 +48,17 @@ namespace tickets.api.Controllers.Admin
             var jwtToken = tokenRepository.CreateJwtToken(user, roles.ToList());
             var response = new LoginResponseDto()
             {
-                Email = user.Email,
-                Roles = roles.ToList(),
-                Token = jwtToken,
-                Nombre = user.Nombre,
-                Apellidos = user.Apellidos,
-                Username = user.UserName
+                AccessToken = jwtToken,
+                TokenType = "bearer",
+                User = new UserDto()
+                {
+                    Id = user.Id,
+                    Name = user.Nombre ?? "" + " " + user.Apellidos ?? "",
+                    Avatar = "",
+                    Roles = roles.ToList(),
+                    Status = "online",
+                    Email = user.Email,
+                }
             };
 
 
