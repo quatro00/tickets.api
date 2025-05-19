@@ -13,17 +13,17 @@ namespace tickets.api.Controllers.Admin
     public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
+        //private readonly SignInManager<ApplicationUser> signInManager;
         private readonly ITokenRepository tokenRepository;
 
         public AuthController(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
+            //SignInManager<ApplicationUser> signInManager,
             ITokenRepository tokenRepository
             )
         {
             this.userManager = userManager;
-            this.signInManager = signInManager;
+            //this.signInManager = signInManager;
             this.tokenRepository = tokenRepository;
         }
 
@@ -34,16 +34,19 @@ namespace tickets.api.Controllers.Admin
             if (user == null)
                 return BadRequest("Usuario o contraseña incorrectos.");
 
-            var result = await signInManager.CheckPasswordSignInAsync(user, model.password, false);
-            if (!result.Succeeded)
+            var result = await this.userManager.CheckPasswordAsync(user, model.password);
+
+
+
+            if (!result)
                 return Unauthorized("Usuario o contraseña incorrectos.");
 
             var roles = await userManager.GetRolesAsync(user);
-            if (roles.IndexOf("Administrador") == -1)
-            {
-                ModelState.AddModelError("error", "Email o password incorrecto.");
-                return ValidationProblem(ModelState);
-            }
+            //if (roles.IndexOf("Administrador") == -1)
+            //{
+            //    ModelState.AddModelError("error", "Email o password incorrecto.");
+            //    return ValidationProblem(ModelState);
+            //}
 
             var jwtToken = tokenRepository.CreateJwtToken(user, roles.ToList());
             var response = new LoginResponseDto()

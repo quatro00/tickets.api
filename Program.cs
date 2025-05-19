@@ -54,12 +54,18 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddDbContext<DbAb1c8aTicketsContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"));
+});
+
 builder.Services.AddDbContext<AuthDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection"));
 });
 
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+builder.Services.AddScoped<IOrganizacionRepository, OrganizacionRepository>();
 /*
 builder.Services.AddScoped<IAspNetUsersRepository, AspNetUsersRepository>();
 
@@ -86,9 +92,15 @@ builder.Services.AddScoped<IAvisoRepository, AvisoRepository>();
 */
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<AuthDbContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddIdentityCore<ApplicationUser>(options =>
+{
+    // Aquí puedes configurar reglas de contraseña, bloqueo, etc.
+})
+.AddRoles<IdentityRole>()
+.AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>("BDS")
+.AddEntityFrameworkStores<AuthDbContext>()
+.AddDefaultTokenProviders();
+
 
 builder.Services.Configure<IdentityOptions>(options => {
     options.Password.RequireDigit = false;
@@ -101,6 +113,26 @@ builder.Services.Configure<IdentityOptions>(options => {
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options => {
+        /*
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine($"[JWT] Error de autenticación: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine($"[JWT] Token válido: {context.Principal.Identity?.Name}");
+                return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                Console.WriteLine("[JWT] Desafío de autenticación.");
+                return Task.CompletedTask;
+            }
+        };
+        */
         options.TokenValidationParameters = new TokenValidationParameters
         {
             AuthenticationType = "Jwt",
@@ -152,6 +184,7 @@ if (
 }
 
 
+app.UseRouting();
 
 app.UseCors("AllowSpecificOrigins");
 app.UseAuthentication();
