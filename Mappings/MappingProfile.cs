@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using System.Diagnostics.Contracts;
 using tickets.api.Models.Domain;
+using tickets.api.Models.DTO.Area;
 using tickets.api.Models.DTO.Organizacion;
+using tickets.api.Models.DTO.Usuario;
 
 namespace tickets.api.Mappings
 {
@@ -9,6 +11,28 @@ namespace tickets.api.Mappings
     {
         public MappingProfile()
         {
+            //Usuarios
+            CreateMap<AspNetUser, GetUsuariosDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
+                .ForMember(dest => dest.Apellido, opt => opt.MapFrom(src => src.Apellidos))
+                .ForMember(dest => dest.Telefono, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.OrganizacionId, opt => opt.MapFrom(src => src.OrganizacionId))
+                .ForMember(dest => dest.Organizacion, opt => opt.MapFrom(src => src.Organizacion.Clave + "-" + src.Organizacion.Nombre))
+                .ForMember(dest => dest.Roles, opt => opt.MapFrom(src => src.Roles.Select(x => x.Name)))
+                .ForMember(dest => dest.Avatar, opt => opt.MapFrom(src => src.Avatar))
+                .ForMember(dest => dest.Activo, opt => opt.MapFrom(src => src.Activo))
+               ;
+            //Area
+            CreateMap<Area, AreaDto>();
+            CreateMap<CrearAreaDto, Area>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
+                 .ForMember(dest => dest.FechaCreacion, opt => opt.MapFrom(src => DateTime.Now))
+                ;
+
+            //Organizacion
             CreateMap<Organizacion, OrganizacionDto>();
             CreateMap<CrearOrganizacionDto, Organizacion>()
                  .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))

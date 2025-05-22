@@ -22,7 +22,10 @@ namespace tickets.api.Repositories.Implementation
         {
             return await _dbSet.FindAsync(id);
         }
-
+        public async Task<T?> GetByIdAsyncString(string id)
+        {
+            return await _dbSet.FindAsync(id);
+        }
         public async Task<T?> GetByIdAsync(Guid id, string idFieldName, params string[] includePaths)
         {
             IQueryable<T> query = _context.Set<T>();

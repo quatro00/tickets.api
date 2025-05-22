@@ -27,5 +27,7 @@ public partial class Organizacion
 
     public Guid? UsuarioModificacion { get; set; }
 
+    public virtual ICollection<Area> Areas { get; set; } = new List<Area>();
+
     public virtual ICollection<AspNetUser> AspNetUsers { get; set; } = new List<AspNetUser>();
 }

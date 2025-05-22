@@ -66,30 +66,9 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IOrganizacionRepository, OrganizacionRepository>();
-/*
+builder.Services.AddScoped<IAreaRepository, AreaRepository>();
 builder.Services.AddScoped<IAspNetUsersRepository, AspNetUsersRepository>();
 
-builder.Services.AddScoped<IEstadoRepository, EstadoRepository>();
-builder.Services.AddScoped<ITipoEnfermeraRepository, TipoEnfermeraRepository>();
-builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
-builder.Services.AddScoped<IContactoRepository, ContactoRepository>();
-builder.Services.AddScoped<IColaboradorRepository, ColaboradorRepository>();
-builder.Services.AddScoped<IBancoRepository, BancoRepository>();
-builder.Services.AddScoped<IColaboradorDocumentoRepository, ColaboradorDocumentoRepository>();
-builder.Services.AddScoped<ITipoLugarRepository, TipoLugarRepository>();
-builder.Services.AddScoped<IServicioRepository, ServicioRepository>();
-builder.Services.AddScoped<IHorarioRepository, HorarioRepository>();
-builder.Services.AddScoped<IConfiguracionRepository, ConfiguracionRepository>();
-builder.Services.AddScoped<IServicioFechaRepository, ServicioFechaRepository>();
-builder.Services.AddScoped<IServicioFechasOfertaRepository, ServicioFechasOfertaRepository>();
-builder.Services.AddScoped<IEncuestaPlantillaRepository, EncuestaPlantillaRepository>();
-builder.Services.AddScoped<IEncuestaPlantillaPreguntaRepository, EncuestaPlantillaPreguntaRepository>();
-builder.Services.AddScoped<IPagoLoteRepository, PagoLoteRepository>();
-builder.Services.AddScoped<IPagoRepository, PagoRepository>();
-builder.Services.AddScoped<IMunicipioRepository, MunicipioRepository>();
-builder.Services.AddScoped<IMensajeRepository, MensajeRepository>();
-builder.Services.AddScoped<IAvisoRepository, AvisoRepository>();
-*/
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
@@ -170,8 +149,9 @@ builder.Services.AddCors(options =>
     });
 });
 
-var app = builder.Build();
 
+var app = builder.Build();
+app.UseStaticFiles();
 // Configure the HTTP request pipeline.
 // Configure the HTTP request pipeline.
 if (

@@ -16,6 +16,8 @@ public partial class DbAb1c8aTicketsContext : DbContext
     {
     }
 
+    public virtual DbSet<Area> Areas { get; set; }
+
     public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
 
     public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; }
@@ -32,12 +34,35 @@ public partial class DbAb1c8aTicketsContext : DbContext
 
     public virtual DbSet<Organizacion> Organizacions { get; set; }
 
+    public virtual DbSet<RelAreaResponsable> RelAreaResponsables { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Data Source=sql1003.site4now.net;Initial Catalog=db_ab1c8a_tickets;Persist Security Info=True;User ID=db_ab1c8a_tickets_admin;Password=Suikoden2;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Area>(entity =>
+        {
+            entity.ToTable("Area");
+
+            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+            entity.Property(e => e.Clave).HasMaxLength(50);
+            entity.Property(e => e.FechaCreacion).HasColumnType("datetime");
+            entity.Property(e => e.FechaModificacion).HasColumnType("datetime");
+            entity.Property(e => e.Nombre).HasMaxLength(250);
+            entity.Property(e => e.Telefono).HasMaxLength(250);
+
+            entity.HasOne(d => d.AreaPadre).WithMany(p => p.InverseAreaPadre)
+                .HasForeignKey(d => d.AreaPadreId)
+                .HasConstraintName("FK_Area_Area");
+
+            entity.HasOne(d => d.Organizacion).WithMany(p => p.Areas)
+                .HasForeignKey(d => d.OrganizacionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Area_Organizacion");
+        });
+
         modelBuilder.Entity<AspNetRole>(entity =>
         {
             entity.Property(e => e.Name).HasMaxLength(256);
@@ -67,6 +92,7 @@ public partial class DbAb1c8aTicketsContext : DbContext
         modelBuilder.Entity<AspNetUser>(entity =>
         {
             entity.Property(e => e.Apellidos).HasMaxLength(250);
+            entity.Property(e => e.Avatar).HasMaxLength(450);
             entity.Property(e => e.Email).HasMaxLength(256);
             entity.Property(e => e.Nombre).HasMaxLength(250);
             entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
@@ -124,6 +150,25 @@ public partial class DbAb1c8aTicketsContext : DbContext
             entity.Property(e => e.Nombre).HasMaxLength(500);
             entity.Property(e => e.Responsable).HasMaxLength(500);
             entity.Property(e => e.Telefono).HasMaxLength(500);
+        });
+
+        modelBuilder.Entity<RelAreaResponsable>(entity =>
+        {
+            entity.ToTable("RelAreaResponsable");
+
+            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+            entity.Property(e => e.FechaCreacion).HasColumnType("datetime");
+            entity.Property(e => e.UsuarioId).HasMaxLength(450);
+
+            entity.HasOne(d => d.Area).WithMany(p => p.RelAreaResponsables)
+                .HasForeignKey(d => d.AreaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RelAreaResponsable_Area");
+
+            entity.HasOne(d => d.Usuario).WithMany(p => p.RelAreaResponsables)
+                .HasForeignKey(d => d.UsuarioId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RelAreaResponsable_AspNetUsers");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -30,7 +30,7 @@ namespace tickets.api.Controllers.Admin
         }
 
         [HttpPost]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Crear([FromBody] CrearOrganizacionDto model)
         {
             // Validar si el modelo es válido
@@ -55,7 +55,7 @@ namespace tickets.api.Controllers.Admin
                 return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
             }
         }
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Actualizar(Guid id, [FromBody] CrearOrganizacionDto dto)
         {
@@ -71,7 +71,7 @@ namespace tickets.api.Controllers.Admin
                 // Mapear solo los campos permitidos del DTO a la entidad
                 mapper.Map(dto, model);
 
-
+                model.Id = id;
                 await this.organizacionRepository.UpdateAsync(model);
 
                 return NoContent();
@@ -104,7 +104,7 @@ namespace tickets.api.Controllers.Admin
 
         }
 
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpPut("{id}/desactivar")]
         public async Task<IActionResult> Desactivar(Guid id)
         {
@@ -135,7 +135,7 @@ namespace tickets.api.Controllers.Admin
 
         }
 
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         [HttpPut("{id}/activar")]
         public async Task<IActionResult> Activar(Guid id)
         {

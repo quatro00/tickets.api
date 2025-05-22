@@ -1,11 +1,10 @@
 ﻿using tickets.api.Models;
+using tickets.api.Models.Domain;
 using tickets.api.Models.DTO.Admin.Auth;
 
 namespace tickets.api.Repositories.Interface
 {
-    public interface IAspNetUsersRepository
+    public interface IAspNetUsersRepository : IGenericRepository<AspNetUser>
     {
-        Task<ResponseModel> GetUserById(Guid id);
-        Task<ResponseModel> ForgotPassword(ForgotPasswordRequestDto model, string token);
     }
 }

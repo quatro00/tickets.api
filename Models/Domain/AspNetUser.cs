@@ -41,6 +41,8 @@ public partial class AspNetUser
 
     public Guid? OrganizacionId { get; set; }
 
+    public string? Avatar { get; set; }
+
     public bool? Activo { get; set; }
 
     public virtual ICollection<AspNetUserClaim> AspNetUserClaims { get; set; } = new List<AspNetUserClaim>();
@@ -50,6 +52,8 @@ public partial class AspNetUser
     public virtual ICollection<AspNetUserToken> AspNetUserTokens { get; set; } = new List<AspNetUserToken>();
 
     public virtual Organizacion? Organizacion { get; set; }
+
+    public virtual ICollection<RelAreaResponsable> RelAreaResponsables { get; set; } = new List<RelAreaResponsable>();
 
     public virtual ICollection<AspNetRole> Roles { get; set; } = new List<AspNetRole>();
 }
