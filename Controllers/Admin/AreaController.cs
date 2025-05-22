@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using tickets.api.Helpers;
+using tickets.api.Models;
 using tickets.api.Models.Domain;
 using tickets.api.Models.DTO.Area;
 using tickets.api.Models.DTO.Organizacion;
+using tickets.api.Models.Specifications;
 using tickets.api.Repositories.Interface;
 
 namespace tickets.api.Controllers.Admin
@@ -86,19 +88,132 @@ namespace tickets.api.Controllers.Admin
         {
             try
             {
-                var result = await this.areaRepository.ListAsync();
+
+                FiltroGlobal filtro = new FiltroGlobal() { IncluirInactivos = true };
+                var spec = new AreaSpecification(filtro);
+                spec.IncludeStrings = new List<string> { "Organizacion", "RelAreaResponsables", "RelAreaResponsables.Usuario" };
+
+
+                var result = await this.areaRepository.ListAsync(spec);
                 if (result == null)
                 {
                     return NotFound(result);
                 }
 
-                var dto = mapper.Map<List<AreaDto>>(result);
+                var dto = mapper.Map<List<GetAreasDto>>(result);
 
                 return Ok(dto);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
+
+        [HttpGet("GetResponsablesArea")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> GetResponsablesArea(Guid areaId)
+        {
+            try
+            {
+
+                var result = await this.areaRepository.GetResponsablesAsync(areaId);
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
+
+        [HttpPost("AsignaResponsables")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> AsignaResponsables([FromBody] AsignaResponsablesRequest request)
+        {
+            try
+            {
+
+                var result = await this.areaRepository.AsignaResponsables(request);
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
+        [Authorize(Roles = "Administrador")]
+        [HttpPut("{id}/desactivar")]
+        public async Task<IActionResult> Desactivar(Guid id)
+        {
+            try
+            {
+                // Obtener el paciente actual desde la base de datos
+                //UpdateContactoDto dto;
+
+                var model = await this.areaRepository.GetByIdAsync(id);
+                if (model == null)
+                {
+                    return NotFound("Dato no encontrado.");
+                }
+
+                // Solo actualizamos el campo 'Activo' a false
+                model.Activo = false;
+                model.UsuarioModificacion = Guid.Parse(User.GetId());
+                model.FechaModificacion = DateTime.Now;
+                // Guardamos los cambios
+
+                await this.areaRepository.UpdateAsync(model);
+
+                return NoContent(); // Respuesta exitosa sin contenido
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrio un error"); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPut("{id}/activar")]
+        public async Task<IActionResult> Activar(Guid id)
+        {
+            try
+            {
+                // Obtener el paciente actual desde la base de datos
+                //UpdateContactoDto dto;
+
+                var model = await this.areaRepository.GetByIdAsync(id);
+                if (model == null)
+                {
+                    return NotFound("Dato no encontrado.");
+                }
+
+                // Solo actualizamos el campo 'Activo' a false
+                model.Activo = true;
+                model.UsuarioModificacion = Guid.Parse(User.GetId());
+                model.FechaModificacion = DateTime.Now;
+                // Guardamos los cambios
+
+                await this.areaRepository.UpdateAsync(model);
+
+                return NoContent(); // Respuesta exitosa sin contenido
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocurrio un error"); // O devolver un BadRequest(400) si el error es de entrada
             }
 
         }

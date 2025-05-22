@@ -26,6 +26,15 @@ namespace tickets.api.Mappings
                 .ForMember(dest => dest.Activo, opt => opt.MapFrom(src => src.Activo))
                ;
             //Area
+            CreateMap<Area, GetAreasDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Organizacion, opt => opt.MapFrom(src => src.Organizacion.Clave + "-" + src.Organizacion.Nombre))
+                .ForMember(dest => dest.Clave, opt => opt.MapFrom(src => src.Clave))
+                .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
+                .ForMember(dest => dest.Responsables, opt => opt.MapFrom(src => src.RelAreaResponsables.Select(x=>x.Usuario.Nombre + " " + x.Usuario.Apellidos)))
+                .ForMember(dest => dest.Telefono, opt => opt.MapFrom(src => src.Telefono))
+                .ForMember(dest => dest.Activo, opt => opt.MapFrom(src => src.Activo))
+                ;
             CreateMap<Area, AreaDto>();
             CreateMap<CrearAreaDto, Area>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Guid.NewGuid()))
