@@ -7,5 +7,6 @@ namespace tickets.api.Repositories.Interface
     {
         Task<List<GetResponsablesDto>> GetResponsablesAsync(Guid areaId);
         Task<bool> AsignaResponsables(AsignaResponsablesRequest model);
+        Task<List<SubAreaDto>> GetArbolAreas(Guid organizacionId);
     }
 }

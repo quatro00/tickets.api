@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using tickets.api.Data;
 using tickets.api.Models.Domain;
 using tickets.api.Models.DTO.Area;
@@ -65,6 +66,45 @@ namespace tickets.api.Repositories.Implementation
 
 
             return usuarios;
+        }
+
+        public async Task<List<SubAreaDto>> GetArbolAreas(Guid organizacionId)
+        {
+            var areasRaiz = await _context.Set<Area>()
+                .Where(x => x.OrganizacionId == organizacionId && x.AreaPadre == null)
+                .ToListAsync();
+
+            var resultado = new List<SubAreaDto>();
+
+            foreach (var area in areasRaiz)
+            {
+                var nodo = await MapearAreaConHijos(area);
+                resultado.Add(nodo);
+            }
+
+            return resultado;
+        }
+
+        private async Task<SubAreaDto> MapearAreaConHijos(Area area)
+        {
+            var hijos = await _context.Set<Area>()
+                .Where(x => x.AreaPadreId == area.Id)
+                .ToListAsync();
+
+            var nodo = new SubAreaDto
+            {
+                Id = area.Id,
+                Nombre = area.Nombre,
+                children = new List<SubAreaDto>()
+            };
+
+            foreach (var hijo in hijos)
+            {
+                var hijoDto = await MapearAreaConHijos(hijo);
+                nodo.children.Add(hijoDto);
+            }
+
+            return nodo;
         }
     }
 }

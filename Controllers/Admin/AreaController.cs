@@ -55,6 +55,46 @@ namespace tickets.api.Controllers.Admin
             }
         }
 
+        [HttpPost("CrearSubArea")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> CrearSubArea([FromBody] CrearSubAreaDto model)
+        {
+            
+            if (!ModelState.IsValid)
+            {
+                User.GetId();
+                return BadRequest("Modelo de datos invalido.");
+            }
+
+            try
+            {
+                // Validar si el modelo es válido
+                var areaPadre = await this.areaRepository.GetByIdAsync(model.areaPadreId);
+
+                CrearAreaDto crearAreaDto = new CrearAreaDto()
+                {
+                    Clave = model.Clave,
+                    Telefono = model.Telefono,
+                    Nombre = model.Nombre,
+                    AreaPadreId = model.areaPadreId,
+                    OrganizacionId = areaPadre.OrganizacionId
+                };
+
+
+                var dto = mapper.Map<Area>(crearAreaDto);
+                dto.UsuarioCreacion = Guid.Parse(User.GetId());
+                // Agregar el paciente al repositorio
+                await this.areaRepository.AddAsync(dto);
+
+                // Devolver la respuesta con el nuevo paciente
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+        }
+
         [Authorize(Roles = "Administrador")]
         [HttpPut("{id}")]
         public async Task<IActionResult> Actualizar(Guid id, [FromBody] CrearAreaDto dto)
@@ -68,10 +108,10 @@ namespace tickets.api.Controllers.Admin
                     return NotFound("Dato no encontrado.");
                 }
 
-                // Mapear solo los campos permitidos del DTO a la entidad
-                mapper.Map(dto, model);
+                model.Clave = dto.Clave;
+                model.Nombre = dto.Nombre;
+                model.Telefono = dto.Telefono; 
 
-                model.Id = id;
                 await this.areaRepository.UpdateAsync(model);
 
                 return NoContent();
@@ -80,6 +120,29 @@ namespace tickets.api.Controllers.Admin
             {
                 return StatusCode(500, "Ocurrio un error al actualizar.");
             }
+        }
+
+        [HttpGet("{id}")]
+        //[Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> Get(Guid id)
+        {
+            try
+            {
+                var result = await this.areaRepository.GetByIdAsync(id);
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                var dto = mapper.Map<GetAreasDto>(result);
+
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
         }
 
         [HttpGet]
@@ -102,7 +165,7 @@ namespace tickets.api.Controllers.Admin
 
                 var dto = mapper.Map<List<GetAreasDto>>(result);
 
-                return Ok(dto);
+                return Ok(dto.OrderBy(x=>x.Clave));
             }
             catch (Exception ex)
             {
@@ -119,6 +182,28 @@ namespace tickets.api.Controllers.Admin
             {
 
                 var result = await this.areaRepository.GetResponsablesAsync(areaId);
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
+
+        [HttpGet("GetArbolAreas")]
+        //[Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> GetArbolAreas(Guid organizacionId)
+        {
+            try
+            {
+
+                var result = await this.areaRepository.GetArbolAreas(organizacionId);
                 if (result == null)
                 {
                     return NotFound(result);
