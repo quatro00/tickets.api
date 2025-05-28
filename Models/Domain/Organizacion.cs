@@ -30,4 +30,6 @@ public partial class Organizacion
     public virtual ICollection<Area> Areas { get; set; } = new List<Area>();
 
     public virtual ICollection<AspNetUser> AspNetUsers { get; set; } = new List<AspNetUser>();
+
+    public virtual ICollection<EquipoTrabajo> EquipoTrabajos { get; set; } = new List<EquipoTrabajo>();
 }

@@ -123,7 +123,7 @@ namespace tickets.api.Controllers.Admin
         }
 
         [HttpGet("{id}")]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Get(Guid id)
         {
             try

@@ -51,9 +51,17 @@ public partial class AspNetUser
 
     public virtual ICollection<AspNetUserToken> AspNetUserTokens { get; set; } = new List<AspNetUserToken>();
 
+    public virtual ICollection<EquipoTrabajoIntegrante> EquipoTrabajoIntegrantes { get; set; } = new List<EquipoTrabajoIntegrante>();
+
+    public virtual ICollection<EquipoTrabajo> EquipoTrabajos { get; set; } = new List<EquipoTrabajo>();
+
     public virtual Organizacion? Organizacion { get; set; }
 
     public virtual ICollection<RelAreaResponsable> RelAreaResponsables { get; set; } = new List<RelAreaResponsable>();
+
+    public virtual ICollection<TicketHistorial> TicketHistorials { get; set; } = new List<TicketHistorial>();
+
+    public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 
     public virtual ICollection<AspNetRole> Roles { get; set; } = new List<AspNetRole>();
 }

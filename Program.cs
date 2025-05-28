@@ -8,8 +8,10 @@ using QuestPDF.Infrastructure;
 using tickets.api.Data;
 using tickets.api.Mappings;
 using tickets.api.Models;
+using tickets.api.Models.Domain;
 using tickets.api.Repositories.Implementation;
 using tickets.api.Repositories.Interface;
+using tickets.api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,7 +69,14 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 builder.Services.AddScoped<IOrganizacionRepository, OrganizacionRepository>();
 builder.Services.AddScoped<IAreaRepository, AreaRepository>();
+builder.Services.AddScoped<ICatCategoriaRepository, CatCategoriaRepository>();
+builder.Services.AddScoped<ICatPrioridadRepository, CatPrioridadRepository>();
 builder.Services.AddScoped<IAspNetUsersRepository, AspNetUsersRepository>();
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+builder.Services.AddScoped<ICatEstatusTicketRepository, CatEstatusTicketRepository>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IEquipoTrabajoIntegrantesRepository, EquipoTrabajoIntegrantesRepository>();
+builder.Services.AddScoped<IEquipoTrabajoRepository, EquipoTrabajoRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

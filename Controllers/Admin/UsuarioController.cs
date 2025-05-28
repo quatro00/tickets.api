@@ -156,6 +156,34 @@ namespace tickets.api.Controllers.Admin
 
         }
 
+        [HttpGet("GetSupervisores")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> GetSupervisores()
+        {
+            try
+            {
+                FiltroGlobal filtro = new FiltroGlobal() { IncluirInactivos = true };
+                var spec = new AspNetUsersSpecification(filtro);
+                spec.IncludeStrings = new List<string> { "Organizacion", "Roles" };
+                spec.Rol = "Supervisor";
+
+                var result = await this.aspNetUsersRepository.ListAsync(spec);
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                var dto = mapper.Map<List<GetUsuariosDto>>(result);
+
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
+
         //[Authorize(Roles = "Administrador")]
         [HttpPut("{id}/desactivar")]
         public async Task<IActionResult> Desactivar(string id)

@@ -32,9 +32,27 @@ public partial class DbAb1c8aTicketsContext : DbContext
 
     public virtual DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
 
+    public virtual DbSet<CatCategorium> CatCategoria { get; set; }
+
+    public virtual DbSet<CatEstatusTicket> CatEstatusTickets { get; set; }
+
+    public virtual DbSet<CatPrioridad> CatPrioridads { get; set; }
+
+    public virtual DbSet<Configuracion> Configuracions { get; set; }
+
+    public virtual DbSet<EquipoTrabajo> EquipoTrabajos { get; set; }
+
+    public virtual DbSet<EquipoTrabajoIntegrante> EquipoTrabajoIntegrantes { get; set; }
+
     public virtual DbSet<Organizacion> Organizacions { get; set; }
 
     public virtual DbSet<RelAreaResponsable> RelAreaResponsables { get; set; }
+
+    public virtual DbSet<Ticket> Tickets { get; set; }
+
+    public virtual DbSet<TicketArchivo> TicketArchivos { get; set; }
+
+    public virtual DbSet<TicketHistorial> TicketHistorials { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -138,6 +156,91 @@ public partial class DbAb1c8aTicketsContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.AspNetUserTokens).HasForeignKey(d => d.UserId);
         });
 
+        modelBuilder.Entity<CatCategorium>(entity =>
+        {
+            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+            entity.Property(e => e.FechaCreacion).HasColumnType("datetime");
+            entity.Property(e => e.FechaModificacion).HasColumnType("datetime");
+            entity.Property(e => e.Nombre).HasMaxLength(50);
+            entity.Property(e => e.UsuarioCreacionId).HasMaxLength(450);
+            entity.Property(e => e.UsuarioModificacionId).HasMaxLength(450);
+        });
+
+        modelBuilder.Entity<CatEstatusTicket>(entity =>
+        {
+            entity.ToTable("CatEstatusTicket");
+
+            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+            entity.Property(e => e.Descripcion).HasMaxLength(520);
+            entity.Property(e => e.Nombre).HasMaxLength(520);
+        });
+
+        modelBuilder.Entity<CatPrioridad>(entity =>
+        {
+            entity.ToTable("CatPrioridad");
+
+            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+            entity.Property(e => e.FechaCreacion).HasColumnType("datetime");
+            entity.Property(e => e.FechaModificacion).HasColumnType("datetime");
+            entity.Property(e => e.Nombre).HasMaxLength(50);
+            entity.Property(e => e.UsuarioCreacionId).HasMaxLength(450);
+            entity.Property(e => e.UsuarioModificacionId).HasMaxLength(450);
+        });
+
+        modelBuilder.Entity<Configuracion>(entity =>
+        {
+            entity.ToTable("Configuracion");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Codigo).HasMaxLength(500);
+            entity.Property(e => e.Descripcion).HasMaxLength(500);
+            entity.Property(e => e.Modulo).HasMaxLength(50);
+            entity.Property(e => e.ValorDate).HasColumnType("datetime");
+            entity.Property(e => e.ValorDecimal).HasColumnType("numeric(18, 2)");
+            entity.Property(e => e.ValorString).HasMaxLength(500);
+        });
+
+        modelBuilder.Entity<EquipoTrabajo>(entity =>
+        {
+            entity.ToTable("EquipoTrabajo");
+
+            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+            entity.Property(e => e.FechaCreacion).HasColumnType("datetime");
+            entity.Property(e => e.FechaModificacion).HasColumnType("datetime");
+            entity.Property(e => e.Nombre).HasMaxLength(50);
+            entity.Property(e => e.SupervisorId).HasMaxLength(450);
+
+            entity.HasOne(d => d.Organizacion).WithMany(p => p.EquipoTrabajos)
+                .HasForeignKey(d => d.OrganizacionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EquipoTrabajo_Organizacion");
+
+            entity.HasOne(d => d.Supervisor).WithMany(p => p.EquipoTrabajos)
+                .HasForeignKey(d => d.SupervisorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EquipoTrabajo_AspNetUsers");
+        });
+
+        modelBuilder.Entity<EquipoTrabajoIntegrante>(entity =>
+        {
+            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+            entity.Property(e => e.FechaCreacion).HasColumnType("datetime");
+            entity.Property(e => e.FechaModificacion).HasColumnType("datetime");
+            entity.Property(e => e.UsuarioCreacion).HasMaxLength(50);
+            entity.Property(e => e.UsuarioId).HasMaxLength(450);
+            entity.Property(e => e.UsuarioModificacion).HasMaxLength(50);
+
+            entity.HasOne(d => d.EquipoTrabajo).WithMany(p => p.EquipoTrabajoIntegrantes)
+                .HasForeignKey(d => d.EquipoTrabajoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EquipoTrabajoIntegrantes_EquipoTrabajo");
+
+            entity.HasOne(d => d.Usuario).WithMany(p => p.EquipoTrabajoIntegrantes)
+                .HasForeignKey(d => d.UsuarioId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_EquipoTrabajoIntegrantes_AspNetUsers");
+        });
+
         modelBuilder.Entity<Organizacion>(entity =>
         {
             entity.ToTable("Organizacion");
@@ -169,6 +272,85 @@ public partial class DbAb1c8aTicketsContext : DbContext
                 .HasForeignKey(d => d.UsuarioId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_RelAreaResponsable_AspNetUsers");
+        });
+
+        modelBuilder.Entity<Ticket>(entity =>
+        {
+            entity.ToTable("Ticket");
+
+            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+            entity.Property(e => e.AreaEspecifica).HasMaxLength(500);
+            entity.Property(e => e.CorreoContacto).HasMaxLength(500);
+            entity.Property(e => e.Descripcion).HasMaxLength(500);
+            entity.Property(e => e.DesdeCuando).HasColumnType("datetime");
+            entity.Property(e => e.FechaCreacion).HasColumnType("datetime");
+            entity.Property(e => e.FechaModificacion).HasColumnType("datetime");
+            entity.Property(e => e.Folio).ValueGeneratedOnAdd();
+            entity.Property(e => e.NombreContacto).HasMaxLength(500);
+            entity.Property(e => e.TelefonoContacto).HasMaxLength(500);
+            entity.Property(e => e.UsuarioAsignadoId).HasMaxLength(450);
+            entity.Property(e => e.UsuarioCreacionId).HasMaxLength(450);
+            entity.Property(e => e.UsuarioModificacion).HasMaxLength(450);
+
+            entity.HasOne(d => d.Area).WithMany(p => p.Tickets)
+                .HasForeignKey(d => d.AreaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Ticket_Area");
+
+            entity.HasOne(d => d.Categoria).WithMany(p => p.Tickets)
+                .HasForeignKey(d => d.CategoriaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Ticket_CatCategoria");
+
+            entity.HasOne(d => d.EstatusTicket).WithMany(p => p.Tickets)
+                .HasForeignKey(d => d.EstatusTicketId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Ticket_CatEstatusTicket");
+
+            entity.HasOne(d => d.Prioridad).WithMany(p => p.Tickets)
+                .HasForeignKey(d => d.PrioridadId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Ticket_CatPrioridad");
+
+            entity.HasOne(d => d.UsuarioCreacion).WithMany(p => p.Tickets)
+                .HasForeignKey(d => d.UsuarioCreacionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Ticket_AspNetUsers");
+        });
+
+        modelBuilder.Entity<TicketArchivo>(entity =>
+        {
+            entity.ToTable("TicketArchivo");
+
+            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+            entity.Property(e => e.Fecha).HasColumnType("datetime");
+            entity.Property(e => e.Nombre).HasMaxLength(50);
+            entity.Property(e => e.Url).HasMaxLength(500);
+
+            entity.HasOne(d => d.Ticket).WithMany(p => p.TicketArchivos)
+                .HasForeignKey(d => d.TicketId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TicketArchivo_Ticket");
+        });
+
+        modelBuilder.Entity<TicketHistorial>(entity =>
+        {
+            entity.ToTable("TicketHistorial");
+
+            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+            entity.Property(e => e.Comentario).HasMaxLength(500);
+            entity.Property(e => e.Fecha).HasColumnType("datetime");
+            entity.Property(e => e.UsuarioId).HasMaxLength(450);
+
+            entity.HasOne(d => d.Ticket).WithMany(p => p.TicketHistorials)
+                .HasForeignKey(d => d.TicketId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TicketHistorial_Ticket");
+
+            entity.HasOne(d => d.Usuario).WithMany(p => p.TicketHistorials)
+                .HasForeignKey(d => d.UsuarioId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TicketHistorial_AspNetUsers");
         });
 
         OnModelCreatingPartial(modelBuilder);

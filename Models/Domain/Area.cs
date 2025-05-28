@@ -34,4 +34,6 @@ public partial class Area
     public virtual Organizacion Organizacion { get; set; } = null!;
 
     public virtual ICollection<RelAreaResponsable> RelAreaResponsables { get; set; } = new List<RelAreaResponsable>();
+
+    public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 }

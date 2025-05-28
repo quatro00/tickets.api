@@ -2,7 +2,11 @@
 using System.Diagnostics.Contracts;
 using tickets.api.Models.Domain;
 using tickets.api.Models.DTO.Area;
+using tickets.api.Models.DTO.CatCategoria;
+using tickets.api.Models.DTO.CatPrioridad;
+using tickets.api.Models.DTO.EquipoTrabajo;
 using tickets.api.Models.DTO.Organizacion;
+using tickets.api.Models.DTO.Ticket;
 using tickets.api.Models.DTO.Usuario;
 
 namespace tickets.api.Mappings
@@ -11,6 +15,44 @@ namespace tickets.api.Mappings
     {
         public MappingProfile()
         {
+            //Equipo Trabajo
+            CreateMap<EquipoTrabajo, GetEquipoTrabajoDto>()
+                            .ForMember(dest => dest.Organizacion, opt => opt.MapFrom(src => src.Organizacion.Clave + "-" + src.Organizacion.Nombre))
+                            .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
+                            .ForMember(dest => dest.Supervisor, opt => opt.MapFrom(src => src.Supervisor.Nombre + " " + src.Supervisor.Apellidos))
+                            //.ForMember(dest => dest.es, opt => opt.MapFrom(src => src.Avatar))
+                            .ForMember(dest => dest.Activo, opt => opt.MapFrom(src => true))
+                            ;
+
+            CreateMap<CrearEquipoTrabajoDto, EquipoTrabajo>()
+                            .ForMember(dest => dest.OrganizacionId, opt => opt.MapFrom(src => src.OrganizacionId))
+                            .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
+                            .ForMember(dest => dest.SupervisorId, opt => opt.MapFrom(src => src.SupervisorId))
+                            //.ForMember(dest => dest.es, opt => opt.MapFrom(src => src.Avatar))
+                            .ForMember(dest => dest.Activo, opt => opt.MapFrom(src => true))
+                            .ForMember(dest => dest.FechaCreacion, opt => opt.MapFrom(src => DateTime.Now))
+                            ;
+            //Tickets
+            CreateMap<CrearTicketDto, Ticket>()
+                .ForMember(dest => dest.CategoriaId, opt => opt.MapFrom(src => src.CategoriaId))
+                .ForMember(dest => dest.PrioridadId, opt => opt.MapFrom(src => src.PrioridadId))
+                .ForMember(dest => dest.AreaId, opt => opt.MapFrom(src => src.AreaId))
+                .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.Descripcion))
+                .ForMember(dest => dest.AreaEspecifica, opt => opt.MapFrom(src => src.AreaEspecifica))
+                .ForMember(dest => dest.NombreContacto, opt => opt.MapFrom(src => src.NombreContacto))
+                .ForMember(dest => dest.TelefonoContacto, opt => opt.MapFrom(src => src.Telefono))
+                .ForMember(dest => dest.CorreoContacto, opt => opt.MapFrom(src => src.Correo))
+                .ForMember(dest => dest.AfectaOperacion, opt => opt.MapFrom(src => src.AfectaOperacion))
+                .ForMember(dest => dest.DesdeCuando, opt => opt.MapFrom(src => src.DesdeCuandoOcurre))
+                //.ForMember(dest => dest.es, opt => opt.MapFrom(src => src.Avatar))
+                .ForMember(dest => dest.Activo, opt => opt.MapFrom(src => true))
+                .ForMember(dest => dest.FechaCreacion, opt => opt.MapFrom(src => DateTime.Now))
+
+               ;
+            //CatCategoria
+            CreateMap<CatCategorium, CatCategoriaDto>();
+            //CatPrioridad
+            CreateMap<CatPrioridad, CatPrioridadDto>();
             //Usuarios
             CreateMap<AspNetUser, GetUsuariosDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
