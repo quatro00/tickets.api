@@ -19,5 +19,7 @@ public partial class CatCategorium
 
     public string? UsuarioModificacionId { get; set; }
 
+    public virtual ICollection<RelEquipoTrabajoCategorium> RelEquipoTrabajoCategoria { get; set; } = new List<RelEquipoTrabajoCategorium>();
+
     public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 }

@@ -48,6 +48,8 @@ public partial class DbAb1c8aTicketsContext : DbContext
 
     public virtual DbSet<RelAreaResponsable> RelAreaResponsables { get; set; }
 
+    public virtual DbSet<RelEquipoTrabajoCategorium> RelEquipoTrabajoCategoria { get; set; }
+
     public virtual DbSet<Ticket> Tickets { get; set; }
 
     public virtual DbSet<TicketArchivo> TicketArchivos { get; set; }
@@ -274,6 +276,21 @@ public partial class DbAb1c8aTicketsContext : DbContext
                 .HasConstraintName("FK_RelAreaResponsable_AspNetUsers");
         });
 
+        modelBuilder.Entity<RelEquipoTrabajoCategorium>(entity =>
+        {
+            entity.Property(e => e.Id).HasDefaultValueSql("(newsequentialid())");
+
+            entity.HasOne(d => d.Categoria).WithMany(p => p.RelEquipoTrabajoCategoria)
+                .HasForeignKey(d => d.CategoriaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RelEquipoTrabajoCategoria_CatCategoria");
+
+            entity.HasOne(d => d.EquipoTrabajo).WithMany(p => p.RelEquipoTrabajoCategoria)
+                .HasForeignKey(d => d.EquipoTrabajoId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RelEquipoTrabajoCategoria_EquipoTrabajo");
+        });
+
         modelBuilder.Entity<Ticket>(entity =>
         {
             entity.ToTable("Ticket");
@@ -312,7 +329,11 @@ public partial class DbAb1c8aTicketsContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Ticket_CatPrioridad");
 
-            entity.HasOne(d => d.UsuarioCreacion).WithMany(p => p.Tickets)
+            entity.HasOne(d => d.UsuarioAsignado).WithMany(p => p.TicketUsuarioAsignados)
+                .HasForeignKey(d => d.UsuarioAsignadoId)
+                .HasConstraintName("FK_Ticket_AspNetUsers1");
+
+            entity.HasOne(d => d.UsuarioCreacion).WithMany(p => p.TicketUsuarioCreacions)
                 .HasForeignKey(d => d.UsuarioCreacionId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Ticket_AspNetUsers");

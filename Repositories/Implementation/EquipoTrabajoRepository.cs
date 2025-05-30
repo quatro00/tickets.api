@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using tickets.api.Data;
 using tickets.api.Models.Domain;
 using tickets.api.Models.DTO.Area;
+using tickets.api.Models.DTO.CatCategoria;
 using tickets.api.Models.DTO.EquipoTrabajo;
 using tickets.api.Repositories.Interface;
 
@@ -17,6 +18,44 @@ namespace tickets.api.Repositories.Implementation
         {
             _context = context;
             _dbSet = _context.Set<EquipoTrabajo>();
+        }
+
+        public async Task<bool> AsignarAgentes(AsignarAgentesRequest model, string usuarioId)
+        {
+            await _context.Set<EquipoTrabajoIntegrante>().Where(x => x.EquipoTrabajoId == model.EquipoTrabajoId).ExecuteDeleteAsync();
+
+            List<EquipoTrabajoIntegrante> responsables = new List<EquipoTrabajoIntegrante>();
+            foreach (var item in model.Responsables)
+            {
+                await this._context.Set<EquipoTrabajoIntegrante>().AddAsync(new EquipoTrabajoIntegrante()
+                {
+                    EquipoTrabajoId = model.EquipoTrabajoId,
+                    UsuarioId = item,
+                    Activo = true,
+                    FechaCreacion = DateTime.Now,
+                    UsuarioCreacion = usuarioId
+                });
+            }
+            this._context.SaveChanges();
+            return true;
+        }
+
+        public async Task<bool> AsignarCategorias(AsignarCategoriasRequest model, string usuarioId)
+        {
+            await _context.Set<RelEquipoTrabajoCategorium>().Where(x => x.EquipoTrabajoId == model.EquipoTrabajoId).ExecuteDeleteAsync();
+
+            List<RelEquipoTrabajoCategorium> responsables = new List<RelEquipoTrabajoCategorium>();
+            foreach (var item in model.Categorias)
+            {
+                await this._context.Set<RelEquipoTrabajoCategorium>().AddAsync(new RelEquipoTrabajoCategorium()
+                {
+                    EquipoTrabajoId = model.EquipoTrabajoId,
+                    CategoriaId = item,
+                    Activo = true
+                });
+            }
+            this._context.SaveChanges();
+            return true;
         }
 
         public async Task<List<GetResponsablesDto>> GetAgentesResponsables(Guid equipoTrabajoId)
@@ -44,6 +83,39 @@ namespace tickets.api.Repositories.Implementation
             .ToListAsync();
 
             return usuarios;
+        }
+
+        public async Task<List<GetCategoriasAsignadasResponse>> GetCategoriasAsignadas(Guid equipoTrabajoId)
+        {
+            //obtenemos todas las categorias
+            var categorias = await _context.Set<CatCategorium>()
+            .ToListAsync();
+
+            if (categorias == null)
+                return new List<GetCategoriasAsignadasResponse>();
+
+            List<GetCategoriasAsignadasResponse> lista = new List<GetCategoriasAsignadasResponse>();
+            foreach (var categoria in categorias)
+            {
+                bool activo = false;
+
+                var relacion = await _context.Set<RelEquipoTrabajoCategorium>()
+                    .Where(x => x.EquipoTrabajoId == equipoTrabajoId && x.CategoriaId == categoria.Id && x.Activo == true).FirstOrDefaultAsync();
+
+                if (relacion != null) { activo = true; }
+
+                GetCategoriasAsignadasResponse itm = new GetCategoriasAsignadasResponse()
+                {
+                    EquipoTrabajoId = equipoTrabajoId,
+                    CategoriaId = categoria.Id,
+                    Nombre = categoria.Nombre,
+                    Activo = activo,
+                };
+
+                lista.Add(itm);
+            }
+
+            return lista;
         }
     }
 }

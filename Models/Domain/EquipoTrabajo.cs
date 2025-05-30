@@ -27,5 +27,7 @@ public partial class EquipoTrabajo
 
     public virtual Organizacion Organizacion { get; set; } = null!;
 
+    public virtual ICollection<RelEquipoTrabajoCategorium> RelEquipoTrabajoCategoria { get; set; } = new List<RelEquipoTrabajoCategorium>();
+
     public virtual AspNetUser Supervisor { get; set; } = null!;
 }

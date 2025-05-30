@@ -7,6 +7,8 @@ using tickets.api.Models.Specifications;
 using tickets.api.Models;
 using tickets.api.Repositories.Interface;
 using tickets.api.Models.DTO.CatCategoria;
+using tickets.api.Helpers;
+using tickets.api.Models.DTO.EquipoTrabajo;
 
 namespace tickets.api.Controllers.Admin
 {
@@ -54,5 +56,7 @@ namespace tickets.api.Controllers.Admin
             }
 
         }
+
+        
     }
 }

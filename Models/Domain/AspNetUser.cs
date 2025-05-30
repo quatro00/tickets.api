@@ -61,7 +61,9 @@ public partial class AspNetUser
 
     public virtual ICollection<TicketHistorial> TicketHistorials { get; set; } = new List<TicketHistorial>();
 
-    public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+    public virtual ICollection<Ticket> TicketUsuarioAsignados { get; set; } = new List<Ticket>();
+
+    public virtual ICollection<Ticket> TicketUsuarioCreacions { get; set; } = new List<Ticket>();
 
     public virtual ICollection<AspNetRole> Roles { get; set; } = new List<AspNetRole>();
 }

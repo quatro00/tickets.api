@@ -84,5 +84,61 @@ namespace tickets.api.Repositories.Implementation
 
             return true;
         }
+
+        public async Task<List<GetTicketsAbiertosResponse>> GetTicketsAbiertos(GetTicketsAbiertosDto model)
+        {
+            var result = await this._dbSet
+                .Include(t => t.UsuarioCreacion)
+                .Include(t => t.Area)
+                    .ThenInclude(a => a.AreaPadre)
+                .Include(t => t.Area)
+                    .ThenInclude(a => a.Organizacion)
+                .Include(t => t.EstatusTicket)
+                .Include(t => t.Categoria)
+                .Include(t => t.UsuarioCreacion)
+                .Include(t => t.UsuarioAsignado)
+                .Include(t => t.Prioridad)
+                .Where(x=>x.EstatusTicket.Clave == 1)
+                .ToListAsync();
+
+            List<GetTicketsAbiertosResponse> res = result
+                .Select(x => 
+                new GetTicketsAbiertosResponse() { 
+                Id = x.Id,
+                Folio = x.Folio,
+                Organizacion = x.Area.Organizacion.Nombre,
+                Solicitante = x.UsuarioCreacion.Nombre + " " + x.UsuarioCreacion.Apellidos,
+                Area = ObtenerJerarquiaArea(x.Area),
+                Estatus = x.EstatusTicket.Descripcion.ToString(),
+                Categoria = x.Categoria.Nombre,
+                Prioridad = x.Prioridad.Nombre,
+                Descripcion = x.Descripcion.ToString(),
+                ContactoNombre = x.NombreContacto ?? "",
+                ContactoTelefono = x.TelefonoContacto ?? "",
+                AfectaOperacion = x.AfectaOperacion,
+                Desde = x.DesdeCuando,
+                Asignado = x.UsuarioAsignado != null ? x.UsuarioAsignado.Nombre + " " + x.UsuarioAsignado.Apellidos : ""
+                }).ToList();
+            /*              
+            foreach (var ticket in result)
+            {
+                var jerarquia = ObtenerJerarquiaArea(ticket.Area);
+                Console.WriteLine($"Jerarquía del ticket {ticket.Id}: {string.Join(" > ", jerarquia.Select(a => a.Nombre))}");
+            }
+            */
+            return res;
+        }
+
+        public List<string> ObtenerJerarquiaArea(Area area)
+        {
+            var jerarquia = new List<string>();
+            while (area != null)
+            {
+                jerarquia.Insert(0, area.Nombre); // Insertar al inicio para que quede de base hacia hoja
+                if (area.AreaPadre == null) { break; }
+                area = area.AreaPadre;
+            }
+            return jerarquia;
+        }
     }
 }

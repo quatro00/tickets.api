@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using tickets.api.Data;
 using tickets.api.Models.Domain;
+using tickets.api.Models.DTO.CatCategoria;
 using tickets.api.Repositories.Interface;
 
 namespace tickets.api.Repositories.Implementation
@@ -16,5 +17,6 @@ namespace tickets.api.Repositories.Implementation
             _dbSet = _context.Set<CatCategorium>();
         }
 
+       
     }
 }

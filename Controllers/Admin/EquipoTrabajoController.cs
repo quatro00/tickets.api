@@ -85,6 +85,28 @@ namespace tickets.api.Controllers.Admin
 
         }
 
+        [HttpPost("AsignarAgentes")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> AsignarAgentes([FromBody] AsignarAgentesRequest request)
+        {
+            try
+            {
+
+                var result = await this.equipoTrabajoRepository.AsignarAgentes(request, User.GetId());
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
+
         [HttpGet("GetAgentesResponsables")]
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> GetAgentes(Guid equipoTrabajoId)
@@ -93,6 +115,50 @@ namespace tickets.api.Controllers.Admin
             {
 
                 var result = await this.equipoTrabajoRepository.GetAgentesResponsables(equipoTrabajoId);
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
+
+        [HttpGet("GetCategoriasAsignadas")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> GetCategoriasAsignadas(Guid equipoTrabajoId)
+        {
+            try
+            {
+
+                var result = await this.equipoTrabajoRepository.GetCategoriasAsignadas(equipoTrabajoId);
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
+
+        [HttpPost("AsignarCategorias")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> AsignarCategorias([FromBody] AsignarCategoriasRequest request)
+        {
+            try
+            {
+
+                var result = await this.equipoTrabajoRepository.AsignarCategorias(request, User.GetId());
                 if (result == null)
                 {
                     return NotFound(result);

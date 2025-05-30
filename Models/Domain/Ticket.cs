@@ -55,5 +55,7 @@ public partial class Ticket
 
     public virtual ICollection<TicketHistorial> TicketHistorials { get; set; } = new List<TicketHistorial>();
 
+    public virtual AspNetUser? UsuarioAsignado { get; set; }
+
     public virtual AspNetUser UsuarioCreacion { get; set; } = null!;
 }

@@ -52,5 +52,27 @@ namespace tickets.api.Controllers.Admin
                 return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
             }
         }
+
+        [HttpGet("GetTicketsAbiertos")]
+        //[Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> GetTicketsAbiertos()
+        {
+            try
+            {
+                GetTicketsAbiertosDto model = new GetTicketsAbiertosDto();
+                var result = await this.ticketRepository.GetTicketsAbiertos(model);
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
     }
 }
