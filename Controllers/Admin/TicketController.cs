@@ -53,8 +53,32 @@ namespace tickets.api.Controllers.Admin
             }
         }
 
+        [HttpGet("GetDetalle/{id}")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> GetDetalle(Guid id)
+        {
+            try
+            {
+                /*
+                var result = await this.areaRepository.GetByIdAsync(id);
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                var dto = mapper.Map<GetAreasDto>(result);
+                */
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
+
         [HttpGet("GetTicketsAbiertos")]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> GetTicketsAbiertos()
         {
             try
