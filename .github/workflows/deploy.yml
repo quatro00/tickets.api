@@ -19,13 +19,13 @@ jobs:
         dotnet-version: '8.0.x'  # Cambia si usas otra versión
 
     - name: Restore dependencies
-      run: dotnet restore ./tickets.api/tickets.api.csproj
+      run: dotnet restore ./tickets.api.csproj
 
     - name: Build
-      run: dotnet build ./tickets.api/tickets.api.csproj --configuration Release --no-restore
+      run: dotnet build ./tickets.api.csproj --configuration Release --no-restore
 
     - name: Publish
-      run: dotnet publish ./tickets.api/tickets.api.csproj --configuration Release --output publish_output
+      run: dotnet publish ./tickets.api.csproj --configuration Release --output publish_output
 
     - name: Deploy via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
