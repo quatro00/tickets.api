@@ -165,7 +165,7 @@ app.UseStaticFiles();
 // Configure the HTTP request pipeline.
 if (
     app.Environment.IsDevelopment()
-    //|| app.Environment.IsProduction()
+    || app.Environment.IsProduction()
     )
 {
     app.UseSwagger();
