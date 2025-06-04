@@ -28,10 +28,10 @@ jobs:
       run: dotnet publish ./tickets.api/tickets.api.csproj --configuration Release --output publish_output
 
     - name: Deploy via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: publish_output/
-        server-dir: /wwwroot/  # Ajusta si tu hosting usa otra carpeta
+        local-dir: ./publish/
+        server-dir: /  # Asegúrate que sea la ruta correcta en tu servidor
