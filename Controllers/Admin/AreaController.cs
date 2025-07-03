@@ -197,7 +197,7 @@ namespace tickets.api.Controllers.Admin
         }
 
         [HttpGet("GetArbolAreas")]
-        //[Authorize(Roles = "Administrador")]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> GetArbolAreas(Guid organizacionId)
         {
             try

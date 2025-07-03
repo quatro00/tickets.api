@@ -58,6 +58,26 @@ namespace tickets.api.Repositories.Implementation
             return true;
         }
 
+        public async Task<List<GetResponsablesDto>> GetAgentes(Guid ticketId)
+        {
+            var ticket = await _context.Set<Ticket>().Include(x=>x.Area).Where(x => x.Id == ticketId).FirstAsync();
+            //buscamos los usuarios asignados a la organizacion
+            var usuarios = await _context.Set<AspNetUser>()
+            .Where(u => u.OrganizacionId == ticket.Area.OrganizacionId && u.Roles.Any(x => x.Name == "Agente"))
+            .Select(user => new GetResponsablesDto
+            {
+                Id = user.Id,
+                Nombre = user.Nombre,
+                Apellidos = user.Apellidos,
+                Username = user.UserName,
+                Activo = true
+            })
+            .ToListAsync();
+
+            return usuarios;
+        }
+
+
         public async Task<List<GetResponsablesDto>> GetAgentesResponsables(Guid equipoTrabajoId)
         {
             var equipoTrabajo = await _context.Set<EquipoTrabajo>()

@@ -24,6 +24,7 @@ namespace tickets.api.Repositories.Implementation
             {
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim("Id", user.Id),
+                new Claim("OrganizacionId", user.OrganizacionId.ToString()),
             };
 
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
@@ -49,6 +50,7 @@ namespace tickets.api.Repositories.Implementation
             {
                 new Claim (ClaimTypes.Email, user.Email!),
                 new Claim ("Id", user.Id),
+                new Claim("OrganizacionId", user.OrganizacionId.ToString()),
             };
 
 

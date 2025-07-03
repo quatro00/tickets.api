@@ -68,6 +68,45 @@ namespace tickets.api.Repositories.Implementation
             return usuarios;
         }
 
+        public async Task<List<SubAreaDto>> GetArbolAreasResponsable(Guid organizacionId)
+        {
+            var areasRaiz = await _context.Set<Area>()
+                .Where(x => x.OrganizacionId == organizacionId && x.AreaPadre == null && x.Activo == true)
+                .ToListAsync();
+
+            var resultado = new List<SubAreaDto>();
+
+            foreach (var area in areasRaiz)
+            {
+                var nodo = await MapearAreaConHijosResponsable(area);
+                resultado.Add(nodo);
+            }
+
+            return resultado;
+        }
+
+        private async Task<SubAreaDto> MapearAreaConHijosResponsable(Area area)
+        {
+            var hijos = await _context.Set<Area>()
+                .Where(x => x.AreaPadreId == area.Id && x.Activo == true)
+                .ToListAsync();
+
+            var nodo = new SubAreaDto
+            {
+                Id = area.Id,
+                Nombre = area.Nombre,
+                children = new List<SubAreaDto>()
+            };
+
+            foreach (var hijo in hijos)
+            {
+                var hijoDto = await MapearAreaConHijosResponsable(hijo);
+                nodo.children.Add(hijoDto);
+            }
+
+            return nodo;
+        }
+
         public async Task<List<SubAreaDto>> GetArbolAreas(Guid organizacionId)
         {
             var areasRaiz = await _context.Set<Area>()

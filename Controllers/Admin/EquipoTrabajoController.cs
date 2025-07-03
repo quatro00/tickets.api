@@ -109,12 +109,34 @@ namespace tickets.api.Controllers.Admin
 
         [HttpGet("GetAgentesResponsables")]
         [Authorize(Roles = "Administrador")]
-        public async Task<IActionResult> GetAgentes(Guid equipoTrabajoId)
+        public async Task<IActionResult> GetAgentesResponsables(Guid equipoTrabajoId)
         {
             try
             {
 
                 var result = await this.equipoTrabajoRepository.GetAgentesResponsables(equipoTrabajoId);
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+
+        }
+
+        [HttpGet("GetAgentesByTicket")]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> GetAgentesByTicket(Guid ticketId)
+        {
+            try
+            {
+
+                var result = await this.equipoTrabajoRepository.GetAgentes(ticketId);
                 if (result == null)
                 {
                     return NotFound(result);

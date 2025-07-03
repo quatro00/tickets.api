@@ -8,6 +8,8 @@ namespace tickets.api.Repositories.Interface
     public interface ITicketRepository : IGenericRepository<Ticket>
     {
         Task<bool> CrearTicket(CrearTicketDto model, string userId, string rutaBase);
+        Task<bool> AgregarMensaje(AgregarMensajeDto model, string userId, string rutaBase);
+        Task<bool> AgregarArchivos(AgregarArchivosDto model, string userId, string rutaBase);
         Task<List<GetTicketsAbiertosResponse>> GetTicketsAbiertos(GetTicketsAbiertosDto model);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Presentation;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.EntityFrameworkCore;
 using tickets.api.Data;
@@ -22,6 +23,87 @@ namespace tickets.api.Repositories.Implementation
             _context = context;
             _dbSet = _context.Set<Ticket>();
             _emailService = emailService;
+        }
+
+        public async Task<bool> AgregarArchivos(AgregarArchivosDto model, string userId, string rutaBase)
+        {
+            List<string> urls = new List<string>();
+            List<TicketArchivo> ticketArchivos = new List<TicketArchivo>();
+            string mensaje = "Se agregan los archivos: ";
+            foreach (var item in model.Archivos)
+            {
+                mensaje = mensaje + item.FileName + ", ";
+                var id = Guid.NewGuid().ToString();
+                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "archivos");
+                var ext = Path.GetExtension(item.FileName);
+                id = id + ext;
+                string pathCompleto = Path.Combine(uploadPath, id);
+                using var stream = new FileStream(pathCompleto, FileMode.Create);
+                await item.CopyToAsync(stream);
+                string rutaPublica = rutaBase + $"{id}";
+                ticketArchivos.Add(new TicketArchivo()
+                {
+                    Nombre = item.FileName,
+                    TicketId = model.TicketId,
+                    Fecha = DateTime.Now,
+                    Url = rutaPublica
+                });
+            }
+            mensaje = mensaje.Trim().Substring(0, mensaje.Trim().Length - 1);
+            TicketHistorial ticketHistorial = new TicketHistorial() 
+            {
+                TicketId = model.TicketId,
+                Fecha = DateTime.Now,
+                UsuarioId = userId,
+                Comentario = mensaje
+            };
+            await _context.Set<TicketHistorial>().AddAsync(ticketHistorial);
+            await _context.Set<TicketArchivo>().AddRangeAsync(ticketArchivos);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> AgregarMensaje(AgregarMensajeDto model, string userId, string rutaBase)
+        {
+            List<string> urls = new List<string>();
+            List<TicketHistorialArchivo> ticketHistorialArchivo = new List<TicketHistorialArchivo>();
+
+            foreach (var item in model.Archivos) 
+            {
+                var id = Guid.NewGuid().ToString();
+                var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "archivos");
+                var ext = Path.GetExtension(item.FileName);
+                id = id + ext;
+                string pathCompleto = Path.Combine(uploadPath, id);
+                using var stream = new FileStream(pathCompleto, FileMode.Create);
+                await item.CopyToAsync(stream);
+                string rutaPublica = rutaBase + $"{id}";
+                ticketHistorialArchivo.Add(new TicketHistorialArchivo()
+                {
+                    Nombre = item.FileName,
+                    TicketHistorialId = model.TicketId,
+                    RutaPublica = rutaPublica,
+                    RutaLocal = pathCompleto,
+                    Activo = true,
+                    FechaCreacion = DateTime.Now,
+                    UsuarioCreacion = userId
+                });
+            }
+
+            TicketHistorial ticketHistorial = new TicketHistorial()
+            {
+                TicketId = model.TicketId,
+                Fecha = DateTime.Now,
+                UsuarioId = userId,
+                Comentario = model.Mensaje,
+                TicketHistorialArchivos = ticketHistorialArchivo,
+            };
+
+            await _context.Set<TicketHistorial>().AddAsync(ticketHistorial);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> CrearTicket(CrearTicketDto model, string userId, string rutaBase)
@@ -85,6 +167,7 @@ namespace tickets.api.Repositories.Implementation
             return true;
         }
 
+       
         public async Task<List<GetTicketsAbiertosResponse>> GetTicketsAbiertos(GetTicketsAbiertosDto model)
         {
             var result = await this._dbSet

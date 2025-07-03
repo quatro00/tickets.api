@@ -20,5 +20,9 @@ namespace tickets.api.Helpers
         {
             return User.FindFirst("Id").Value;
         }
+        public static string GetOrganizacionId(this ClaimsPrincipal User)
+        {
+            return User.FindFirst("OrganizacionId").Value;
+        }
     }
 }

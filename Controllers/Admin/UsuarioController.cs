@@ -116,7 +116,7 @@ namespace tickets.api.Controllers.Admin
                 {
                     return NotFound(result);
                 }
-
+                result = result.Where(x => x.Roles.Any(y => y.SistemaId == 3)).ToList();
                 var dto = mapper.Map<List<GetUsuariosDto>>(result);
 
                 return Ok(dto);

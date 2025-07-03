@@ -33,6 +33,48 @@ namespace tickets.api.Mappings
                             .ForMember(dest => dest.FechaCreacion, opt => opt.MapFrom(src => DateTime.Now))
                             ;
             //Tickets
+            CreateMap<Ticket, GetTicketDetalleDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Folio, opt => opt.MapFrom(src => src.Folio))
+                .ForMember(dest => dest.Categoria, opt => opt.MapFrom(src => src.Categoria.Nombre))
+                .ForMember(dest => dest.Prioridad, opt => opt.MapFrom(src => src.Prioridad.Nombre))
+                .ForMember(dest => dest.Area, opt => opt.MapFrom(src => src.Area.Nombre))
+                .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.Descripcion))
+                .ForMember(dest => dest.AfectaOperacion, opt => opt.MapFrom(src => src.AfectaOperacion ? "Sí" : "No"))
+                .ForMember(dest => dest.DesdeCuandoSePresenta, opt => opt.MapFrom(src => src.DesdeCuando))
+                .ForMember(dest => dest.Estatus, opt => opt.MapFrom(src => src.EstatusTicket.Nombre))
+                .ForMember(dest => dest.ContactoNombre, opt => opt.MapFrom(src => src.NombreContacto))
+                .ForMember(dest => dest.ContactoCorreo, opt => opt.MapFrom(src => src.CorreoContacto))
+                .ForMember(dest => dest.ContactoTelefono, opt => opt.MapFrom(src => src.TelefonoContacto))
+                .ForMember(dest => dest.AsignadoNombre, opt => opt.MapFrom(src => src.UsuarioAsignado.Nombre + src.UsuarioAsignado.Apellidos))
+                .ForMember(dest => dest.AsignadoCorreo, opt => opt.MapFrom(src => src.UsuarioAsignado.Email))
+                .ForMember(dest => dest.AsignadoTelefono, opt => opt.MapFrom(src => src.UsuarioAsignado.PhoneNumber))
+                .ForMember(dest => dest.Archivos, opt => opt.MapFrom(src => src.TicketArchivos))
+                .ForMember(dest => dest.Mensajes, opt => opt.MapFrom(src => src.TicketHistorials))
+                ;
+
+            CreateMap<TicketHistorial, GetTicketDetalleMensaje>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Usuario.Nombre + " " + src.Usuario.Apellidos))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Usuario.UserName))
+                .ForMember(dest => dest.Mensaje, opt => opt.MapFrom(src => src.Comentario))
+                .ForMember(dest => dest.Fecha, opt => opt.MapFrom(src => src.Fecha))
+                .ForMember(dest => dest.Archivos, opt => opt.MapFrom(src => src.TicketHistorialArchivos))
+                ;
+
+            CreateMap<TicketArchivo, GetTicketDetalleArchivo>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
+                .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.Url))
+                .ForMember(dest => dest.Fecha, opt => opt.MapFrom(src => src.Fecha))
+                ;
+
+            CreateMap<TicketHistorialArchivo, GetTicketDetalleMensajeArchivo>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
+                .ForMember(dest => dest.RutaPublica, opt => opt.MapFrom(src => src.RutaPublica))
+                ;
+
             CreateMap<CrearTicketDto, Ticket>()
                 .ForMember(dest => dest.CategoriaId, opt => opt.MapFrom(src => src.CategoriaId))
                 .ForMember(dest => dest.PrioridadId, opt => opt.MapFrom(src => src.PrioridadId))
@@ -91,6 +133,14 @@ namespace tickets.api.Mappings
                  ;
             CreateMap<UpdateOrganizacionDto, Organizacion>()
                 ;
+
+            CreateMap<CatEstatusTicket, GetEstatusTicketDto>()
+               .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+               .ForMember(dest => dest.Clave, opt => opt.MapFrom(src => src.Clave))
+               .ForMember(dest => dest.Nombre, opt => opt.MapFrom(src => src.Nombre))
+               .ForMember(dest => dest.Descripcion, opt => opt.MapFrom(src => src.Descripcion))
+               ;
+
             //    CreateMap<PagoLote, GetPagosColaboradorDto>()
             //       .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             //       .ForMember(dest => dest.Folio, opt => opt.MapFrom(src => src.No))

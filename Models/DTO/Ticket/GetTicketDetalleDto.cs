@@ -28,11 +28,20 @@
         public string Perfil { get; set; }
         public string Mensaje { get; set; }
         public DateTime Fecha { get; set; }
+        public List<GetTicketDetalleMensajeArchivo> Archivos { get; set; } = new List<GetTicketDetalleMensajeArchivo>();
     }
     public class GetTicketDetalleArchivo
     {
         public Guid Id { get; set; }
         public string Nombre { get; set; }
         public string Url { get; set; }
+        public DateTime Fecha { get; set; }
+    }
+    public class GetTicketDetalleMensajeArchivo
+    {
+        public Guid Id { get; set; }
+        public Guid TicketHistorialId { get; set; }
+        public string Nombre { get; set; }
+        public string RutaPublica { get; set; }
     }
 }
