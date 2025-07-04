@@ -158,7 +158,6 @@ namespace tickets.api.Controllers.Admin
             {
                 return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
             }
-
         }
 
         [HttpGet("GetEstatusTicket")]

@@ -11,5 +11,6 @@ namespace tickets.api.Repositories.Interface
         Task<bool> AgregarMensaje(AgregarMensajeDto model, string userId, string rutaBase);
         Task<bool> AgregarArchivos(AgregarArchivosDto model, string userId, string rutaBase);
         Task<List<GetTicketsAbiertosResponse>> GetTicketsAbiertos(GetTicketsAbiertosDto model);
+        Task<List<GetTicketsAbiertosResponse>> GetTicketsAbiertosResponsable(GetTicketsAbiertosDto model, string usuarioCreacionId);
     }
 }
