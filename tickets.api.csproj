@@ -36,7 +36,6 @@
 
   <ItemGroup>
     <Folder Include="Controllers\Usuario\" />
-    <Folder Include="Controllers\Supervisor\" />
     <Folder Include="wwwroot\archivos\" />
   </ItemGroup>
 

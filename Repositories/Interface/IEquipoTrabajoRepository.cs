@@ -9,6 +9,7 @@ namespace tickets.api.Repositories.Interface
     {
         Task<List<GetResponsablesDto>> GetAgentesResponsables(Guid equipoTrabajoId);
         Task<List<GetResponsablesDto>> GetAgentes(Guid ticketId);
+        Task<List<GetResponsablesDto>> GetAgentesByResponsable(string userId);
         Task<bool> AsignarAgentes(AsignarAgentesRequest model, string usuarioId);
         Task<List<GetCategoriasAsignadasResponse>> GetCategoriasAsignadas(Guid equipoTrabajoId);
         Task<bool> AsignarCategorias(AsignarCategoriasRequest model, string usuarioId);
