@@ -6,6 +6,7 @@ using tickets.api.Models.DTO.CatCategoria;
 using tickets.api.Models.Specifications;
 using tickets.api.Models;
 using tickets.api.Repositories.Interface;
+using tickets.api.Helpers;
 
 namespace tickets.api.Controllers.Supervisor
 {
@@ -34,10 +35,11 @@ namespace tickets.api.Controllers.Supervisor
 
                 FiltroGlobal filtro = new FiltroGlobal() { IncluirInactivos = false };
                 var spec = new CatCategoriaSpecification(filtro);
-                spec.IncludeStrings = new List<string> { };
+                spec.IncludeStrings = new List<string> { "RelEquipoTrabajoCategoria", "RelEquipoTrabajoCategoria.EquipoTrabajo" };
 
 
                 var result = await this.catCategoriaRepository.ListAsync(spec);
+                result = result.Where(x => x.RelEquipoTrabajoCategoria.Any(x => x.EquipoTrabajo.SupervisorId.ToUpper() == User.GetId().ToUpper())).ToList();
                 if (result == null)
                 {
                     return NotFound(result);

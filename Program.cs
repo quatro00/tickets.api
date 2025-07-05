@@ -163,14 +163,14 @@ var app = builder.Build();
 app.UseStaticFiles();
 // Configure the HTTP request pipeline.
 // Configure the HTTP request pipeline.
-if (
-    app.Environment.IsDevelopment()
-    || app.Environment.IsProduction()
-    )
-{
+//if (
+//    app.Environment.IsDevelopment()
+//    || app.Environment.IsProduction()
+//    )
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 
 app.UseRouting();

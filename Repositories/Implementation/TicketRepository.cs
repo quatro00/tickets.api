@@ -156,11 +156,11 @@ namespace tickets.api.Repositories.Implementation
             await this._context.SaveChangesAsync();
 
             var ticket = await this._context.Set<Ticket>()
-    .Include(t => t.Area)
-    .Include(t => t.UsuarioCreacion)
-    .Include(t => t.EstatusTicket)
-    .Include(t => t.Prioridad)
-    .FirstOrDefaultAsync(t => t.Id == dto.Id);
+            .Include(t => t.Area)
+            .Include(t => t.UsuarioCreacion)
+            .Include(t => t.EstatusTicket)
+            .Include(t => t.Prioridad)
+            .FirstOrDefaultAsync(t => t.Id == dto.Id);
 
             await this._emailService.SendTicketNotificationAsync(ticket);
 
@@ -211,21 +211,81 @@ namespace tickets.api.Repositories.Implementation
             */
             return res;
         }
-        public async Task<List<GetTicketsAbiertosResponse>> GetTicketsAbiertosSupervisor(GetTicketsAbiertosDto model, Guid organizacionId)
+        public async Task<List<GetTicketsAbiertosResponse>> GetTicketsAbiertosSupervisor(GetTicketsAbiertosDto model, Guid organizacionId, string usuarioId)
         {
             var result = await this._dbSet
-                .Include(t => t.UsuarioCreacion)
-                .Include(t => t.Area)
-                    .ThenInclude(a => a.AreaPadre)
-                .Include(t => t.Area)
-                    .ThenInclude(a => a.Organizacion)
-                .Include(t => t.EstatusTicket)
-                .Include(t => t.Categoria)
-                .Include(t => t.UsuarioCreacion)
-                .Include(t => t.UsuarioAsignado)
-                .Include(t => t.Prioridad)
-                .Where(x => x.EstatusTicket.Clave == 1 && (x.Area.OrganizacionId == organizacionId))
-                .ToListAsync();
+            .Include(t => t.UsuarioCreacion)
+            .Include(t => t.Area)
+                .ThenInclude(a => a.AreaPadre)
+            .Include(t => t.Area)
+                .ThenInclude(a => a.Organizacion)
+            .Include(t => t.EstatusTicket)
+            .Include(t => t.Categoria)
+                .ThenInclude(c => c.RelEquipoTrabajoCategoria)
+                    .ThenInclude(rel => rel.EquipoTrabajo)
+            .Include(t => t.UsuarioAsignado)
+            .Include(t => t.Prioridad)
+            .Where(x =>
+                x.EstatusTicket.Clave == 1 &&
+                x.Area.OrganizacionId == organizacionId &&
+                x.Categoria.RelEquipoTrabajoCategoria.Any(rel =>
+                    rel.EquipoTrabajo.SupervisorId.ToUpper() == usuarioId.ToUpper() &&
+                    rel.EquipoTrabajo.OrganizacionId == organizacionId
+                )
+            )
+            .ToListAsync();
+
+            List<GetTicketsAbiertosResponse> res = result
+                .Select(x =>
+                new GetTicketsAbiertosResponse()
+                {
+                    Id = x.Id,
+                    Folio = x.Folio,
+                    Organizacion = x.Area.Organizacion.Nombre,
+                    Solicitante = x.UsuarioCreacion.Nombre + " " + x.UsuarioCreacion.Apellidos,
+                    Area = ObtenerJerarquiaArea(x.Area),
+                    Estatus = x.EstatusTicket.Descripcion.ToString(),
+                    Categoria = x.Categoria.Nombre,
+                    Prioridad = x.Prioridad.Nombre,
+                    Descripcion = x.Descripcion.ToString(),
+                    ContactoNombre = x.NombreContacto ?? "",
+                    ContactoTelefono = x.TelefonoContacto ?? "",
+                    AfectaOperacion = x.AfectaOperacion,
+                    Desde = x.DesdeCuando,
+                    Asignado = x.UsuarioAsignado != null ? x.UsuarioAsignado.Nombre + " " + x.UsuarioAsignado.Apellidos : ""
+                }).ToList();
+            /*              
+            foreach (var ticket in result)
+            {
+                var jerarquia = ObtenerJerarquiaArea(ticket.Area);
+                Console.WriteLine($"Jerarquía del ticket {ticket.Id}: {string.Join(" > ", jerarquia.Select(a => a.Nombre))}");
+            }
+            */
+            return res;
+        }
+        public async Task<List<GetTicketsAbiertosResponse>> GetTicketsAsignadosSupervisor(GetTicketsAbiertosDto model, Guid organizacionId, string usuarioId)
+        {
+            var result = await this._dbSet
+            .Include(t => t.UsuarioCreacion)
+            .Include(t => t.Area)
+                .ThenInclude(a => a.AreaPadre)
+            .Include(t => t.Area)
+                .ThenInclude(a => a.Organizacion)
+            .Include(t => t.EstatusTicket)
+            .Include(t => t.Categoria)
+                .ThenInclude(c => c.RelEquipoTrabajoCategoria)
+                    .ThenInclude(rel => rel.EquipoTrabajo)
+            .Include(t => t.UsuarioAsignado)
+            .Include(t => t.Prioridad)
+            .Where(x =>
+                (x.EstatusTicket.Clave == 3 || x.EstatusTicket.Clave == 4 || x.EstatusTicket.Clave == 5 || x.EstatusTicket.Clave == 6 ) &&
+                x.Area.OrganizacionId == organizacionId &&
+                x.Categoria.RelEquipoTrabajoCategoria.Any(rel =>
+                    rel.EquipoTrabajo.SupervisorId.ToUpper() == usuarioId.ToUpper() &&
+                    rel.EquipoTrabajo.OrganizacionId == organizacionId
+                )
+            )
+            .ToListAsync();
 
             List<GetTicketsAbiertosResponse> res = result
                 .Select(x =>

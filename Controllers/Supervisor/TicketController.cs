@@ -56,6 +56,27 @@ namespace tickets.api.Controllers.Supervisor
             }
         }
 
+        [HttpGet("GetTicketsAsignados")]
+        [Authorize(Roles = "Supervisor")]
+        public async Task<IActionResult> GetTicketsAsignados()
+        {
+            try
+            {
+                GetTicketsAbiertosDto model = new GetTicketsAbiertosDto();
+                var result = await this.ticketRepository.GetTicketsAsignadosSupervisor(model, Guid.Parse(User.GetOrganizacionId()), User.GetId());
+                if (result == null)
+                {
+                    return NotFound(result);
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+        }
+
         [HttpGet("GetTicketsAbiertos")]
         [Authorize(Roles = "Supervisor")]
         public async Task<IActionResult> GetTicketsAbiertos()
@@ -63,7 +84,7 @@ namespace tickets.api.Controllers.Supervisor
             try
             {
                 GetTicketsAbiertosDto model = new GetTicketsAbiertosDto();
-                var result = await this.ticketRepository.GetTicketsAbiertosSupervisor(model, Guid.Parse(User.GetOrganizacionId()));
+                var result = await this.ticketRepository.GetTicketsAbiertosSupervisor(model, Guid.Parse(User.GetOrganizacionId()), User.GetId());
                 if (result == null)
                 {
                     return NotFound(result);
@@ -165,8 +186,11 @@ namespace tickets.api.Controllers.Supervisor
             {
                 //buscamos el ticket
                 var ticket = await this.ticketRepository.GetByIdAsync(dto.TicketId);
-                ticket.UsuarioAsignadoId = dto.AsignadoId;
+                var estatusTicket = await this.catEstatusTicketRepository.ListAsync();
+                var estatus = estatusTicket.Where(x => x.Nombre == "Asignado").FirstOrDefault();
 
+                ticket.UsuarioAsignadoId = dto.AsignadoId;
+                ticket.EstatusTicketId = estatus.Id;
                 ticket.TicketHistorials.Add(new TicketHistorial()
                 {
                     TicketId = ticket.Id,
@@ -183,6 +207,93 @@ namespace tickets.api.Controllers.Supervisor
                 return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
             }
 
+        }
+
+        [HttpPost("CancelarTicket")]
+        [Authorize(Roles = "Supervisor")]
+        public async Task<IActionResult> CancelarTicket([FromBody] CancelarTicketDto dto)
+        {
+            try
+            {
+                //buscamos el ticket
+                var ticket = await this.ticketRepository.GetByIdAsync(dto.ticketId);
+                var estatusTicket = await this.catEstatusTicketRepository.ListAsync();
+                var estatus = estatusTicket.Where(x => x.Nombre == "Cancelado").FirstOrDefault();
+
+                ticket.EstatusTicketId = estatus.Id;
+                ticket.TicketHistorials.Add(new TicketHistorial()
+                {
+                    TicketId = ticket.Id,
+                    Fecha = DateTime.Now,
+                    UsuarioId = User.GetId(),
+                    Comentario = dto.mensaje
+                });
+
+                await this.ticketRepository.UpdateAsync(ticket);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+        }
+
+        [HttpPost("EnEsperaTicket")]
+        [Authorize(Roles = "Supervisor")]
+        public async Task<IActionResult> EnEsperaTicket([FromBody] EnEsperaTicketDto dto)
+        {
+            try
+            {
+                //buscamos el ticket
+                var ticket = await this.ticketRepository.GetByIdAsync(dto.ticketId);
+                var estatusTicket = await this.catEstatusTicketRepository.ListAsync();
+                var estatus = estatusTicket.Where(x => x.Nombre == "En espera").FirstOrDefault();
+
+                ticket.EstatusTicketId = estatus.Id;
+                ticket.TicketHistorials.Add(new TicketHistorial()
+                {
+                    TicketId = ticket.Id,
+                    Fecha = DateTime.Now,
+                    UsuarioId = User.GetId(),
+                    Comentario = dto.mensaje
+                });
+
+                await this.ticketRepository.UpdateAsync(ticket);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
+        }
+
+        [HttpPost("ResolverTicket")]
+        [Authorize(Roles = "Supervisor")]
+        public async Task<IActionResult> ResolverTicket([FromBody] ResolverTicketDto dto)
+        {
+            try
+            {
+                //buscamos el ticket
+                var ticket = await this.ticketRepository.GetByIdAsync(dto.ticketId);
+                var estatusTicket = await this.catEstatusTicketRepository.ListAsync();
+                var estatus = estatusTicket.Where(x => x.Nombre == "Resuelto").FirstOrDefault();
+
+                ticket.EstatusTicketId = estatus.Id;
+                ticket.TicketHistorials.Add(new TicketHistorial()
+                {
+                    TicketId = ticket.Id,
+                    Fecha = DateTime.Now,
+                    UsuarioId = User.GetId(),
+                    Comentario = dto.mensaje
+                });
+
+                await this.ticketRepository.UpdateAsync(ticket);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.InnerException.Message); // O devolver un BadRequest(400) si el error es de entrada
+            }
         }
     }
 }

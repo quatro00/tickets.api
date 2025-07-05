@@ -12,6 +12,7 @@ namespace tickets.api.Repositories.Interface
         Task<bool> AgregarArchivos(AgregarArchivosDto model, string userId, string rutaBase);
         Task<List<GetTicketsAbiertosResponse>> GetTicketsAbiertos(GetTicketsAbiertosDto model);
         Task<List<GetTicketsAbiertosResponse>> GetTicketsAbiertosResponsable(GetTicketsAbiertosDto model, string usuarioCreacionId);
-        Task<List<GetTicketsAbiertosResponse>> GetTicketsAbiertosSupervisor(GetTicketsAbiertosDto model, Guid organizacionId);
+        Task<List<GetTicketsAbiertosResponse>> GetTicketsAbiertosSupervisor(GetTicketsAbiertosDto model, Guid organizacionId, string usuarioId);
+        Task<List<GetTicketsAbiertosResponse>> GetTicketsAsignadosSupervisor(GetTicketsAbiertosDto model, Guid organizacionId, string usuarioId);
     }
 }
